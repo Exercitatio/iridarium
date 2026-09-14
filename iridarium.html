@@ -1,0 +1,1081 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="theme-color" content="#07070a">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="apple-mobile-web-app-title" content="IRIDARIUM">
+    <title>IRIDARIUM | Послойная структура</title>
+    <link rel="manifest" href="manifest.json">
+    <link rel="icon" type="image/png" href="pic/iri-logo.png">
+    <link rel="apple-touch-icon" href="pic/iri-logo.png">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600&family=JetBrains+Mono:wght@400;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --bg-color: #07070a;
+            --text-main: #d1d5db;
+            --text-muted: #9ca3af;
+            --glass-bg: rgba(255, 255, 255, 0.02);
+            --glass-border: rgba(255, 255, 255, 0.06);
+        }
+
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+        html { scroll-behavior: smooth; }
+        html, body { min-height: 100%; }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: var(--bg-color);
+            background-image: 
+                radial-gradient(circle at 10% 20%, rgba(0, 242, 254, 0.04), transparent 30%),
+                radial-gradient(circle at 90% 80%, rgba(240, 147, 251, 0.04), transparent 30%),
+                linear-gradient(rgba(255, 255, 255, 0.015) 1px, transparent 1px),
+                linear-gradient(90deg, rgba(255, 255, 255, 0.015) 1px, transparent 1px);
+            background-size: 100% 100%, 100% 100%, 40px 40px, 40px 40px;
+            color: var(--text-main);
+            line-height: 1.6;
+            overflow-x: hidden;
+            display: flex;
+            flex-direction: column;
+        }
+
+        h1, h2, h3, h4, summary {
+            font-family: 'JetBrains Mono', monospace;
+            font-weight: 700;
+            letter-spacing: -0.5px;
+        }
+
+        .iridescent-text {
+            background: linear-gradient(90deg, #00f2fe, #4facfe, #f093fb, #f5576c);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            color: transparent;
+            display: inline-block;
+        }
+
+        header {
+            padding: 0.8rem 5%;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-bottom: 1px solid var(--glass-border);
+            backdrop-filter: blur(10px);
+            position: sticky;
+            top: 0;
+            z-index: 100;
+            background: rgba(7, 7, 10, 0.85);
+            gap: 1.5rem;
+        }
+
+        .header-left {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            flex-shrink: 0;
+        }
+
+        .logo-round {
+            width: 56px;
+            height: 56px;
+            border-radius: 50%;
+            object-fit: cover;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            box-shadow: 0 0 20px rgba(0, 242, 254, 0.15);
+        }
+
+        .header-brand { display: flex; flex-direction: column; }
+
+        .logo {
+            font-size: 1.3rem;
+            font-weight: 700;
+            letter-spacing: 2px;
+            line-height: 1.1;
+        }
+
+        .logo span {
+            font-family: 'Inter', sans-serif;
+            font-weight: 300;
+            font-size: 0.7rem;
+            color: var(--text-muted);
+            letter-spacing: 0;
+        }
+
+        .dating {
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 0.62rem;
+            color: #6b7280;
+            margin-top: 4px;
+            line-height: 1.5;
+            letter-spacing: 0.3px;
+        }
+
+        .dating .sep { color: #374151; margin: 0 4px; }
+        .dating .matrix { color: #00f2fe; opacity: 0.8; }
+
+        .tree-banner {
+            width: 100%;
+            height: 420px;
+            background: url('pic/tree.jpg') center/cover no-repeat, linear-gradient(135deg, #0a0a1a 0%, #1a0a2a 50%, #0a1a2a 100%);
+            background-blend-mode: overlay;
+            position: relative;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+            overflow: hidden;
+        }
+
+        .tree-banner::after {
+            content: '';
+            position: absolute;
+            bottom: 0; left: 0; right: 0;
+            height: 140px;
+            background: linear-gradient(to top, var(--bg-color), transparent);
+            pointer-events: none;
+            z-index: 1;
+        }
+
+        .thesis-overlay {
+            position: absolute;
+            top: 30px;
+            right: 40px;
+            bottom: 60px;
+            width: 460px;
+            max-width: 42vw;
+            padding: 1.2rem 1.4rem;
+            background: rgba(7, 7, 12, 0.65);
+            backdrop-filter: blur(10px);
+            -webkit-backdrop-filter: blur(10px);
+            border: 1px solid rgba(240, 147, 251, 0.2);
+            border-radius: 12px;
+            z-index: 5;
+            overflow-y: auto;
+            font-size: 0.75rem;
+            line-height: 1.55;
+            color: #d1d5db;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.6), inset 0 0 40px rgba(240, 147, 251, 0.04);
+            scrollbar-width: thin;
+            scrollbar-color: rgba(240, 147, 251, 0.3) transparent;
+        }
+
+        .thesis-overlay::-webkit-scrollbar { width: 4px; }
+        .thesis-overlay::-webkit-scrollbar-thumb { background: rgba(240, 147, 251, 0.3); border-radius: 2px; }
+
+        .thesis-overlay p { margin-bottom: 0.6rem; }
+
+        .thesis-overlay strong { color: #f093fb; font-weight: 600; }
+
+        .thesis-overlay .author {
+            display: block;
+            margin-top: 0.8rem;
+            text-align: right;
+            color: #f5576c;
+            font-weight: 600;
+            font-size: 0.72rem;
+            letter-spacing: 1px;
+            font-style: normal;
+        }
+
+        .hero {
+            padding: 3rem 5% 1rem;
+            text-align: center;
+            position: relative;
+            z-index: 2;
+        }
+
+        .hero h1 { font-size: 2.5rem; margin-bottom: 0.5rem; }
+        .hero p { color: var(--text-muted); font-size: 1rem; margin-bottom: 0.3rem; }
+
+        .search-container {
+            max-width: 800px;
+            margin: 0 auto 3rem;
+            padding: 0 5%;
+            position: relative;
+            z-index: 10;
+        }
+
+        .search-box {
+            width: 100%;
+            padding: 1rem 1.5rem;
+            background: rgba(20, 20, 30, 0.8);
+            backdrop-filter: blur(12px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 12px;
+            color: #fff;
+            font-family: 'Inter', sans-serif;
+            font-size: 1rem;
+            outline: none;
+            transition: all 0.3s ease;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
+        }
+        .search-box:focus { border-color: #00f2fe; box-shadow: 0 0 20px rgba(0, 242, 254, 0.2); }
+        .search-box::placeholder { color: #4b5563; }
+
+        .search-counter {
+            position: absolute;
+            right: calc(5% + 18px);
+            top: 50%;
+            transform: translateY(-50%);
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 0.7rem;
+            color: #00f2fe;
+            opacity: 0;
+            transition: opacity 0.3s ease;
+            pointer-events: none;
+        }
+
+        .search-counter.visible { opacity: 0.8; }
+
+        .tree-container {
+            max-width: 900px;
+            margin: 0 auto;
+            padding: 0 5%;
+            flex: 1;
+            padding-right: 150px;
+        }
+
+        details {
+            margin-bottom: 0.8rem;
+            border-radius: 8px;
+            background: var(--glass-bg);
+            border: 1px solid var(--glass-border);
+            transition: all 0.4s cubic-bezier(0.25, 0.8, 0.25, 1);
+            overflow: hidden;
+            position: relative;
+        }
+
+        details[open] {
+            background: var(--layer-bg, rgba(255, 255, 255, 0.02));
+            border-color: var(--layer-accent, rgba(255, 255, 255, 0.2));
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.6), inset 0 0 30px var(--layer-glow, rgba(255, 255, 255, 0.05));
+            margin-bottom: 1.5rem;
+            transform: translateY(-2px);
+        }
+
+        details[open] > summary {
+            border-bottom: 1px solid var(--layer-border, rgba(255, 255, 255, 0.1));
+            background: linear-gradient(90deg, var(--layer-header, rgba(255, 255, 255, 0.05)), transparent);
+        }
+
+        summary {
+            padding: 1rem 1.5rem;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 0.8rem;
+            font-size: 0.95rem;
+            color: #e5e7eb;
+            list-style: none;
+            transition: all 0.3s ease;
+            user-select: none;
+        }
+
+        summary::-webkit-details-marker { display: none; }
+
+        summary::before {
+            content: '▶';
+            font-size: 0.7rem;
+            color: var(--layer-accent, #00f2fe);
+            transition: transform 0.3s ease, color 0.3s ease;
+        }
+
+        details[open] > summary::before { transform: rotate(90deg); }
+
+        .icon {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            color: var(--layer-accent, #00f2fe);
+            flex-shrink: 0;
+            width: 20px;
+            height: 20px;
+        }
+
+        .icon svg {
+            width: 100%; height: 100%;
+            stroke: currentColor; fill: none;
+            stroke-width: 1.5; stroke-linecap: round; stroke-linejoin: round;
+        }
+
+        summary:hover { background: rgba(255, 255, 255, 0.04); padding-left: 1.8rem; }
+
+        .layer-content {
+            padding: 1rem 1.5rem 1rem 3rem;
+            position: relative;
+        }
+
+        .layer-content::before {
+            content: '';
+            position: absolute;
+            left: 1.5rem; top: 0; bottom: 0;
+            width: 1px;
+            background: linear-gradient(to bottom, var(--layer-accent, #00f2fe), transparent);
+            opacity: 0.3;
+        }
+
+        details[open] > .layer-content { animation: slideDown 0.4s ease-out forwards; }
+
+        @keyframes slideDown {
+            from { opacity: 0; transform: translateY(-10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .layer-content > details {
+            background: rgba(255, 255, 255, 0.01);
+            border-color: rgba(255, 255, 255, 0.04);
+            margin-left: 0.5rem;
+        }
+
+        .layer-content > details[open] {
+            background: rgba(255, 255, 255, 0.02);
+            border-color: var(--layer-accent, rgba(255, 255, 255, 0.2));
+            border-left: 3px solid var(--layer-accent, #00f2fe);
+        }
+
+        .layer-content > details > summary { font-size: 0.9rem; padding: 0.8rem 1.2rem; }
+
+        .doc-item {
+            padding: 0.6rem 1rem;
+            margin-bottom: 0.5rem;
+            background: rgba(255, 255, 255, 0.02);
+            border-left: 2px solid var(--layer-accent, #10b981);
+            border-radius: 0 4px 4px 0;
+            font-size: 0.85rem;
+            color: #cbd5e1;
+            transition: all 0.2s ease;
+            display: flex;
+            align-items: flex-start;
+            gap: 10px;
+        }
+
+        .doc-item:hover {
+            background: rgba(255, 255, 255, 0.05);
+            transform: translateX(5px);
+            color: #fff;
+        }
+
+        .doc-item::before {
+            content: '◇';
+            color: var(--layer-accent, #10b981);
+            font-size: 1rem;
+            line-height: 1.4;
+        }
+
+        .doc-item mark {
+            background: rgba(0, 242, 254, 0.25);
+            color: #fff;
+            padding: 0 2px;
+            border-radius: 2px;
+        }
+
+        .theme-philosophy { --layer-accent:#f093fb; --layer-glow:rgba(240,147,251,0.15); --layer-border:rgba(240,147,251,0.3); --layer-header:rgba(240,147,251,0.1); }
+        .theme-physics    { --layer-accent:#00f2fe; --layer-glow:rgba(0,242,254,0.15); --layer-border:rgba(0,242,254,0.3); --layer-header:rgba(0,242,254,0.1); }
+        .theme-matrices   { --layer-accent:#8b5cf6; --layer-glow:rgba(139,92,246,0.15); --layer-border:rgba(139,92,246,0.3); --layer-header:rgba(139,92,246,0.1); }
+        .theme-tech       { --layer-accent:#10b981; --layer-glow:rgba(16,185,129,0.15); --layer-border:rgba(16,185,129,0.3); --layer-header:rgba(16,185,129,0.1); }
+        .theme-economy    { --layer-accent:#fbbf24; --layer-glow:rgba(251,191,36,0.15); --layer-border:rgba(251,191,36,0.3); --layer-header:rgba(251,191,36,0.1); }
+        .theme-archive    { --layer-accent:#9ca3af; --layer-glow:rgba(156,163,175,0.15); --layer-border:rgba(156,163,175,0.3); --layer-header:rgba(156,163,175,0.1); }
+
+        .side-plaques {
+            position: fixed;
+            right: 0;
+            top: calc(50% + 100px);
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+            z-index: 90;
+            padding: 0;
+        }
+
+        .plaque {
+            display: flex;
+            align-items: center;
+            justify-content: flex-end;
+            width: 130px;
+            padding: 12px 16px 12px 12px;
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 0.7rem;
+            letter-spacing: 0.5px;
+            text-transform: uppercase;
+            text-decoration: none;
+            color: #cbd5e1;
+            background: rgba(20, 20, 30, 0.85);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            border-right: none;
+            border-radius: 8px 0 0 8px;
+            transition: all 0.3s ease;
+            text-align: right;
+            position: relative;
+            overflow: hidden;
+            cursor: pointer;
+        }
+
+        .plaque::before {
+            content: '';
+            position: absolute;
+            left: 0; top: 0; bottom: 0;
+            width: 3px;
+            background: var(--p-accent, #00f2fe);
+            transition: width 0.3s ease;
+        }
+
+        .plaque:hover {
+            color: #fff;
+            width: 145px;
+            border-color: var(--p-accent, #00f2fe);
+            box-shadow: -8px 0 24px var(--p-glow, rgba(0,242,254,0.25));
+        }
+
+        .plaque:hover::before { width: 5px; }
+
+        .plaque.p-home    { --p-accent:#00f2fe; --p-glow:rgba(0,242,254,0.3); }
+        .plaque.p-manifest{ --p-accent:#f093fb; --p-glow:rgba(240,147,251,0.3); }
+        .plaque.p-author  { --p-accent:#fbbf24; --p-glow:rgba(251,191,36,0.3); }
+        .plaque.p-contacts{ --p-accent:#10b981; --p-glow:rgba(16,185,129,0.3); }
+
+        .site-footer {
+            margin-top: 5rem;
+            background: rgba(0, 0, 0, 0.4);
+            border-top: 1px solid var(--glass-border);
+            backdrop-filter: blur(10px);
+            padding: 3rem 5% 0;
+        }
+
+        .footer-grid {
+            max-width: 1100px;
+            margin: 0 auto;
+            display: grid;
+            grid-template-columns: 2fr 1fr 1fr;
+            gap: 3rem;
+            padding-bottom: 2.5rem;
+            align-items: start;
+        }
+
+        .footer-brand-block {
+            display: flex;
+            align-items: center;
+            gap: 1.2rem;
+            margin-bottom: 1rem;
+        }
+
+        .logo-square {
+            width: 90px;
+            height: 90px;
+            object-fit: contain;
+            filter: drop-shadow(0 0 20px rgba(240, 147, 251, 0.2));
+        }
+
+        .footer-col h4 {
+            font-size: 0.8rem;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            color: var(--text-muted);
+            margin-bottom: 1.2rem;
+            font-family: 'JetBrains Mono', monospace;
+        }
+
+        .footer-col p { font-size: 0.85rem; color: #94a3b8; line-height: 1.7; }
+        .footer-col ul { list-style: none; }
+        .footer-col ul li { margin-bottom: 0.6rem; }
+
+        .footer-col ul li a {
+            color: #94a3b8;
+            text-decoration: none;
+            font-size: 0.85rem;
+            transition: color 0.2s ease, padding-left 0.2s ease;
+            display: inline-block;
+        }
+
+        .footer-col ul li a:hover { color: #00f2fe; padding-left: 5px; }
+        .footer-col ul li a::before { content: '› '; color: #4b5563; transition: color 0.2s ease; }
+        .footer-col ul li a:hover::before { color: #00f2fe; }
+
+        .footer-brand {
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 1.3rem;
+            font-weight: 700;
+            letter-spacing: 2px;
+        }
+
+        .footer-tagline {
+            font-style: italic;
+            color: #64748b;
+            font-size: 0.8rem;
+            margin-top: 1rem;
+            padding-left: 12px;
+            border-left: 2px solid #f093fb;
+        }
+
+        .footer-stats {
+            width: 100%;
+            max-width: 1100px;
+            margin: 0 auto;
+            padding: 2rem 0;
+            border-top: 1px solid rgba(255, 255, 255, 0.05);
+            border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+            display: grid;
+            grid-template-columns: repeat(6, 1fr);
+            gap: 1rem;
+            text-align: center;
+        }
+
+        .stat-item {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 0.4rem;
+            padding: 0.5rem 0.2rem;
+        }
+
+        .stat-value {
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 1.6rem;
+            font-weight: 700;
+            line-height: 1;
+            background: linear-gradient(135deg, #00f2fe, #f093fb);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            color: transparent;
+        }
+
+        .stat-label {
+            font-size: 0.65rem;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            color: #64748b;
+            font-family: 'JetBrains Mono', monospace;
+            line-height: 1.3;
+        }
+
+        .platforms-line {
+            width: 100%;
+            max-width: 1100px;
+            margin: 0 auto;
+            padding: 1rem 0 1.5rem;
+            text-align: center;
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 0.7rem;
+            color: #4b5563;
+            letter-spacing: 0.8px;
+            line-height: 1.8;
+        }
+
+        .platforms-line .sep { color: #374151; margin: 0 8px; }
+        .platforms-line .future { color: #fbbf24; opacity: 0.7; }
+
+        .footer-bottom {
+            max-width: 1100px;
+            margin: 0 auto;
+            padding: 1.5rem 0;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 1rem;
+            border-top: 1px solid rgba(255, 255, 255, 0.03);
+        }
+
+        .footer-bottom p {
+            font-size: 0.75rem;
+            color: #4b5563;
+            font-family: 'JetBrains Mono', monospace;
+        }
+
+        .footer-bottom .dot {
+            display: inline-block;
+            width: 6px; height: 6px;
+            border-radius: 50%;
+            background: #10b981;
+            margin-right: 8px;
+            box-shadow: 0 0 8px #10b981;
+            animation: pulse 2s infinite;
+        }
+
+        @keyframes pulse {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.4; }
+        }
+
+        @media (max-width: 1100px) {
+            .tree-container { padding-right: 5%; }
+            .thesis-overlay {
+                position: relative;
+                top: auto; right: auto; bottom: auto;
+                width: auto;
+                max-width: none;
+                margin: 1rem;
+                font-size: 0.8rem;
+                max-height: none;
+            }
+            .tree-banner { height: auto; min-height: 320px; padding-bottom: 1rem; }
+            .side-plaques {
+                position: static;
+                transform: none;
+                flex-direction: row;
+                flex-wrap: wrap;
+                justify-content: center;
+                margin: 2rem auto;
+                padding: 0 5%;
+                top: auto;
+            }
+            .plaque {
+                width: auto;
+                min-width: 100px;
+                border-right: 1px solid rgba(255, 255, 255, 0.08);
+                border-radius: 8px;
+                justify-content: center;
+                padding: 10px 14px;
+            }
+            .plaque:hover { width: auto; }
+            .footer-stats { grid-template-columns: repeat(3, 1fr); }
+        }
+
+        @media (max-width: 900px) {
+            .footer-grid {
+                grid-template-columns: 1fr 1fr;
+                gap: 2rem;
+            }
+            .footer-grid .footer-col:first-child {
+                grid-column: 1 / -1;
+            }
+        }
+
+        @media (max-width: 600px) {
+            .hero h1 { font-size: 1.8rem; }
+            .layer-content { padding-left: 1.5rem; }
+            .layer-content::before { left: 0.5rem; }
+            summary { padding: 0.8rem 1rem; }
+            .footer-grid {
+                grid-template-columns: 1fr 1fr;
+                gap: 1.5rem;
+            }
+            .footer-grid .footer-col:first-child {
+                grid-column: 1 / -1;
+            }
+            .footer-stats {
+                grid-template-columns: repeat(2, 1fr);
+                gap: 1rem;
+                padding: 1.5rem 0;
+            }
+            .stat-value { font-size: 1.4rem; }
+            .footer-bottom { flex-direction: column; text-align: center; }
+            .plaque { font-size: 0.6rem; padding: 8px 10px; min-width: 80px; }
+        }
+    </style>
+</head>
+<body>
+
+    <header>
+        <div class="header-left">
+            <img src="pic/iri-logo.png" alt="IRIDARIUM" class="logo-round">
+            <div class="header-brand">
+                <div class="logo iridescent-text">IRIDARIUM <span>by PRO sites w3</span></div>
+                <div class="dating" id="datingBlock">
+                    <!-- JS заполнит -->
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <div class="tree-banner">
+        <div class="thesis-overlay">
+            <p>Если посмотреть на метод Стивена Кови немного под другим углом, то вспоминается русская поговорка про лопаты — «один выроет себе могилу, другой подготовит себе фундамент для бассейна».</p>
+            <p>Так к чему это я клоню ваши взъерошенные мысли. Складывая в свой сосуд основные большие камни: быть семья, работа и прочие социальные обязанности — мы, да <strong>МЫ</strong>, забываем, что всегда есть выбор.</p>
+            <p>Промежуточные камни небольшого размера перед тем как просыпать песком времени — просто замените. Просто замените <strong>ЭТО</strong> на зёрна кукурузы.</p>
+            <p>Потом, когда это всё осядет и вам покажется, что всё, края видно и что делать дальше? А дальше кладите на это всё! Нет, не то что подумали. Если у вас он конечно есть, самый большой, самый важный, самый горячий камень — <strong>Ядро</strong>. Прям сверху и кладите.</p>
+            <p>Попкорн раскроется и вытолкнет всё наносное. Останется самое важное. А попкорн кушайте и наслаждайтесь слайдами жизни. Ваше кино начнётся снова, но уже по другому сценарию. Да и не кино уже. Всем добра на все лета! ©</p>
+            <span class="author">— Ваш Дмитрий С.</span>
+        </div>
+    </div>
+
+    <section class="hero">
+        <h1 class="iridescent-text">Послойная структура знаний</h1>
+        <p>Odeome economic stabilization web 3.0.</p>
+        <p>Раскройте каждый слой, чтобы увидеть содержимое.</p>
+    </section>
+
+    <div class="search-container">
+        <input type="text" id="searchInput" class="search-box" placeholder="🔍 Поиск по всем документам...">
+        <span class="search-counter" id="searchCounter"></span>
+    </div>
+
+    <nav class="side-plaques">
+        <a href="#top" class="plaque p-home" data-scroll="top">Главная</a>
+        <a href="#" class="plaque p-manifest" data-scroll="layer-1">Манифест</a>
+        <a href="#" class="plaque p-author" data-scroll="footer">Авторство</a>
+        <a href="#" class="plaque p-contacts" data-scroll="footer">Контакты</a>
+    </nav>
+
+    <div class="tree-container" id="top">
+
+        <details class="theme-philosophy" id="layer-1">
+            <summary>
+                <span class="icon"><svg viewBox="0 0 24 24"><path d="M2 12C2 12 5 5 12 5C19 5 22 12 22 12C22 12 19 19 12 19C5 19 2 12 2 12Z"/><circle cx="12" cy="12" r="3"/></svg></span>
+                <span>Слой 1: Философия, Манифесты и Творчество</span>
+            </summary>
+            <div class="layer-content">
+                <details>
+                    <summary>Инициализация творческого процесса</summary>
+                    <div class="layer-content">
+                        <div class="doc-item">Запустить процесс собственного творческого мышления</div>
+                        <div class="doc-item">Важно - видеть образ, который вы способны сотворить</div>
+                    </div>
+                </details>
+                <details>
+                    <summary>Манифесты и Дэжавю</summary>
+                    <div class="layer-content">
+                        <div class="doc-item">МАНИФЕСТ О ДЭЖАВЮ: ТЕОРИЯ ЛОЖНОЙ БИФУРКАЦИИ И ОТВОДА ГЛАЗ</div>
+                        <div class="doc-item">ДОКАЗАТЕЛЬСТВО ТЕОРИИ ДЭЖАВЮ: ПОЛНЫЙ АКАДЕМИЧЕСКИЙ МАНИФЕСТ v.1</div>
+                        <div class="doc-item">ДОКАЗАТЕЛЬСТВО ТЕОРИИ ДЭЖАВЮ: КАК РОЖДАЕТСЯ ИСТИНА</div>
+                        <div class="doc-item">Академический Документ: К теории бифуркационной динамики осознанности</div>
+                        <div class="doc-item">МАНИФЕСТ ЦЕЛОСТНОГО СОЗНАНИЯ</div>
+                    </div>
+                </details>
+                <details>
+                    <summary>Символизм и Числа</summary>
+                    <div class="layer-content">
+                        <div class="doc-item">ЗОЛОТОЕ СЕЧЕНИЕ в (Ё)</div>
+                        <div class="doc-item">Парадокс «дебила»: почему мы смеёмся над теми, кто создаёт наш мир</div>
+                        <div class="doc-item">От пластилина до генома, от Пуанкаре до Ферма</div>
+                        <div class="doc-item">Путь к Храму: Виноградник и его символизм</div>
+                        <div class="doc-item">ПОСЛАНИЕ БОГОВ ИЗ ДРЕВНОСТИ</div>
+                    </div>
+                </details>
+                <details>
+                    <summary>Реальность и Восприятие</summary>
+                    <div class="layer-content">
+                        <div class="doc-item">ТЕКСТЫ, КОТОРЫЕ МЕНЯЮТ РЕАЛЬНОСТЬ</div>
+                        <div class="doc-item">МОДЕЛЬ РЕАЛЬНОСТИ</div>
+                        <div class="doc-item">МАСКИ, ЭВОЛЮЦИЯ И НЕЙРОННЫЕ СЕТИ</div>
+                        <div class="doc-item">НАРРАТИВЫ</div>
+                        <div class="doc-item">ОСТАТКИ ВОСПРИЯТИЯ</div>
+                        <div class="doc-item">СРЕЗ СОСТОЯНИЯ СУБЪЕКТА (СТРИЖКОВ Д.Н.)</div>
+                        <div class="doc-item">ФЕНОМЕН ФЛАГА РФ: СТРУКТУРНАЯ МОДЕЛЬ ЦВЕТА, БУКВЫ И ПЕРЕХОДА</div>
+                        <div class="doc-item">ПАВЛИНИЙ ХВОСТ ОПЕРАТОРА</div>
+                        <div class="doc-item">«ОАЗИС С НУЛЯ»</div>
+                        <div class="doc-item">БЕЗОТНОСИТЕЛЬНОСТЬ ЭФИРА</div>
+                    </div>
+                </details>
+            </div>
+        </details>
+
+        <details class="theme-physics" id="layer-2">
+            <summary>
+                <span class="icon"><svg viewBox="0 0 24 24"><ellipse cx="12" cy="12" rx="10" ry="4"/><ellipse cx="12" cy="12" rx="10" ry="4" transform="rotate(60 12 12)"/><ellipse cx="12" cy="12" rx="10" ry="4" transform="rotate(120 12 12)"/><circle cx="12" cy="12" r="1.5" fill="currentColor" stroke="none"/></svg></span>
+                <span>Слой 2: Квантовая физика, Резонанс и Гипер-документы</span>
+            </summary>
+            <div class="layer-content">
+                <details>
+                    <summary>Гипер-документы и Модели Сознания</summary>
+                    <div class="layer-content">
+                        <div class="doc-item">ГИПЕР-ДОКУМЕНТ: К ВОПРОСУ О ФУНДАМЕНТАЛЬНОЙ ТОПОЛОГИЧЕСКОЙ МОДЕЛИ РОЖДЕНИЯ МАТЕРИИ</div>
+                        <div class="doc-item">ГИПЕР-ДОКУМЕНТ: ЦЕЛОСТНАЯ МОДЕЛЬ СОЗНАНИЯ, ЭВОЛЮЦИИ И КВАНТОВОЙ ДИНАМИКИ</div>
+                        <div class="doc-item">ГИПЕР-ДОКУМЕНТ 3.2: ЕДИНАЯ МОДЕЛЬ ЭВОЛЮЦИИ, СОЗНАНИЯ И ГЕНОТИПА</div>
+                        <div class="doc-item">ГИПЕР-ДОКУМЕНТ 3.1: РАСШИРЕННАЯ МОДЕЛЬ СОЗНАНИЯ, ГЕНОТИПА И КВАНТОВОГО ВОЗДЕЙСТВИЯ</div>
+                        <div class="doc-item">ФОРМУЛИРОВКА МОДЕЛИ ГИПЕР-ДОКУМЕНТ 3.0</div>
+                        <div class="doc-item">ИТОГОВЫЙ АКТ: Модель сознания, эволюции и квантовой динамики</div>
+                    </div>
+                </details>
+                <details>
+                    <summary>Бозон Хиггса, БАК и Топология</summary>
+                    <div class="layer-content">
+                        <div class="doc-item">ДОКУМЕНТ № 2026-07-30-БАК-РАБЛЕ-ШВЕЙЦАРИЯ ФИКСАЦИИ фикций Бозон Хиггса</div>
+                        <div class="doc-item">Геокосмическая локация и квантовая свобода</div>
+                        <div class="doc-item">Топология «Волшебной Земли» (Уникальность и Пуанкаре)</div>
+                        <div class="doc-item">ТЕОРИЯ ПОЯВЛЕНИЯ ВСЕГО НА ПЛАНЕТЕ</div>
+                    </div>
+                </details>
+                <details>
+                    <summary>Резонансная Физика и Двигатели</summary>
+                    <div class="layer-content">
+                        <div class="doc-item">Модель резонансной физики и диалоговой архитектуры</div>
+                        <div class="doc-item">Ответ на парадокс Фейнмана: разгадка</div>
+                        <div class="doc-item">Модель №2 - «Резонансный вакуумный движитель»</div>
+                        <div class="doc-item">ГРАВИТАЦИЯ КАК ГРАДИЕНТ ПЛОТНОСТИ ЭФИРА</div>
+                        <div class="doc-item">ГИПЕРДОКУМЕНТ: МАГНИТНО-РЕЗОНАНСНОЕ ДВИЖЕНИЕ</div>
+                        <div class="doc-item">ДВИГАТЕЛЬ «РАК-ПАРУС-РЕЗОНАНС»</div>
+                        <div class="doc-item">МЕТОДИКА РАСЧЁТА РЕЗОНАНСНОГО ДВИГАТЕЛЯ</div>
+                        <div class="doc-item">ТЕХНОЛОГИЯ «РАК-ПАРУС-РЕЗОНАНС»</div>
+                    </div>
+                </details>
+                <details>
+                    <summary>Задачи Тысячелетия и Гипотезы</summary>
+                    <div class="layer-content">
+                        <div class="doc-item">01 - ЗАДАЧА 1: P = NP</div>
+                        <div class="doc-item">02 - ЗАДАЧА 2: ГИПОТЕЗА РИМАНА</div>
+                        <div class="doc-item">03 - ЗАДАЧА 3 : ГИПОТЕЗА ХОДЖА</div>
+                        <div class="doc-item">04 - ЗАДАЧА 4: ТЕОРИЯ ЯНГА — МИЛЛСА</div>
+                        <div class="doc-item">05 - ЗАДАЧА 5: ГИПОТЕЗА БЁРЧА — СВИННЕРТОН-ДАЙЕРА</div>
+                        <div class="doc-item">06 - ЗАДАЧА 6: ГИПОТЕЗА ПУАНКАРЕ (СОБСТВЕННОЕ РЕШЕНИЕ)</div>
+                        <div class="doc-item">07 - ГИПОТЕЗА ПЛАНКА-СТРИЖКОВА</div>
+                        <div class="doc-item">08 - ТЕОРИЯ ГРАВИТАЦИИ СТРИЖКОВА</div>
+                        <div class="doc-item">09 - ДОКУМЕНТ. РЕЗОНАНСНАЯ ИНТЕРПРЕТАЦИЯ КОРПУСКУЛЯРНО-ВОЛНОВОГО ДУАЛИЗМА</div>
+                    </div>
+                </details>
+            </div>
+        </details>
+
+        <details class="theme-matrices" id="layer-3">
+            <summary>
+                <span class="icon"><svg viewBox="0 0 24 24" fill="currentColor" stroke="none">
+                    <circle cx="3" cy="3" r="0.9"/><circle cx="6" cy="3" r="0.9"/><circle cx="9" cy="3" r="0.9"/><circle cx="12" cy="3" r="0.9"/><circle cx="15" cy="3" r="0.9"/><circle cx="18" cy="3" r="0.9"/><circle cx="21" cy="3" r="0.9"/>
+                    <circle cx="3" cy="6" r="0.9"/><circle cx="6" cy="6" r="0.9"/><circle cx="9" cy="6" r="0.9"/><circle cx="12" cy="6" r="0.9"/><circle cx="15" cy="6" r="0.9"/><circle cx="18" cy="6" r="0.9"/><circle cx="21" cy="6" r="0.9"/>
+                    <circle cx="3" cy="9" r="0.9"/><circle cx="6" cy="9" r="0.9"/><circle cx="9" cy="9" r="0.9"/><circle cx="12" cy="9" r="0.9"/><circle cx="15" cy="9" r="0.9"/><circle cx="18" cy="9" r="0.9"/><circle cx="21" cy="9" r="0.9"/>
+                    <circle cx="3" cy="12" r="0.9"/><circle cx="6" cy="12" r="0.9"/><circle cx="9" cy="12" r="0.9"/><circle cx="12" cy="12" r="0.9"/><circle cx="15" cy="12" r="0.9"/><circle cx="18" cy="12" r="0.9"/><circle cx="21" cy="12" r="0.9"/>
+                    <circle cx="3" cy="15" r="0.9"/><circle cx="6" cy="15" r="0.9"/><circle cx="9" cy="15" r="0.9"/><circle cx="12" cy="15" r="0.9"/><circle cx="15" cy="15" r="0.9"/><circle cx="18" cy="15" r="0.9"/><circle cx="21" cy="15" r="0.9"/>
+                    <circle cx="3" cy="18" r="0.9"/><circle cx="6" cy="18" r="0.9"/><circle cx="9" cy="18" r="0.9"/><circle cx="12" cy="18" r="0.9"/><circle cx="15" cy="18" r="0.9"/><circle cx="18" cy="18" r="0.9"/><circle cx="21" cy="18" r="0.9"/>
+                    <circle cx="3" cy="21" r="0.9"/><circle cx="6" cy="21" r="0.9"/><circle cx="9" cy="21" r="0.9"/><circle cx="12" cy="21" r="0.9"/><circle cx="15" cy="21" r="0.9"/><circle cx="18" cy="21" r="0.9"/><circle cx="21" cy="21" r="0.9"/>
+                </svg></span>
+                <span>Слой 3: Матрицы, Лингвистика и Когнитивные модели</span>
+            </summary>
+            <div class="layer-content">
+                <details>
+                    <summary>Матрица 7×7 и Числовые Поля</summary>
+                    <div class="layer-content">
+                        <div class="doc-item">МАТРИЦА 7×7 КАК ИНСТРУМЕНТ ДЛЯ ПРИНЦИПА НАКОПЛЕНИЯ-РАЗРЯДА</div>
+                        <div class="doc-item">СОВПАДЕНИЯ В МАТРИЦЕ 7×7</div>
+                        <div class="doc-item">Документ 2: Структурный анализ матрицы 7×7 (Теория графов)</div>
+                        <div class="doc-item">Документ 3: Структурный анализ матрицы 7×7 (Теория информации)</div>
+                        <div class="doc-item">Документ 4: Структурный анализ матрицы 7×7 (Когнитивный аспект)</div>
+                        <div class="doc-item">Документ 5: Структурный анализ матрицы 7×7 (Визуализация)</div>
+                        <div class="doc-item">О структуре пересечения числового и смыслового полей: от матрицы 7×7 к триаде Явь-Навь-Правь</div>
+                        <div class="doc-item">От матрицы к песне: как наложение числовых структур порождает смысл</div>
+                    </div>
+                </details>
+                <details>
+                    <summary>Лингвистика и Диалоги</summary>
+                    <div class="layer-content">
+                        <div class="doc-item">v.0 - w3 = foolLcoNaCt)*49 @EXERCITATIO</div>
+                        <div class="doc-item">01 - Матрица диалогов 7×7: Крылов, «КуТак» и Архетипы</div>
+                        <div class="doc-item">02 - Лингвистический «Заёб» как метод</div>
+                        <div class="doc-item">03 - Академическая психологическая оценка оппонента</div>
+                        <div class="doc-item">04 - Можно ли измерить IQ по диалогу?</div>
+                        <div class="doc-item">05 - НОВОЕ РАСШИРЕНИЕ: "русский_фольклор_версия_10.0_экстрим"</div>
+                        <div class="doc-item">07. Лингво-магия w3 проявление</div>
+                        <div class="doc-item">08. Кто такие экзерцисты в религиозном смысле</div>
+                        <div class="doc-item">08.1 Жемчужина в контексте диалога</div>
+                        <div class="doc-item">09. И-Цзин — это не гадание в бытовом смысле</div>
+                    </div>
+                </details>
+            </div>
+        </details>
+
+        <details class="theme-tech" id="layer-4">
+            <summary>
+                <span class="icon"><svg viewBox="0 0 24 24"><path d="M12 2L21 7V17L12 22L3 17V7L12 2Z"/><circle cx="12" cy="12" r="3"/></svg></span>
+                <span>Слой 4: Технические спецификации, Импланты и Двигатели</span>
+            </summary>
+            <div class="layer-content">
+                <details>
+                    <summary>Биологические резонаторы и Импланты</summary>
+                    <div class="layer-content">
+                        <div class="doc-item">БИОЛОГИЧЕСКИЙ АКУСТИЧЕСКИЙ РЕЗОНАТОР: ОТ ОБРАТНОГО</div>
+                        <div class="doc-item">СХЕМА ИМПЛАНТА: БИОЛОГИЧЕСКИЙ РЕЗОНАТОР</div>
+                        <div class="doc-item">КАК ПЕРЕДАВАТЬ СОСТОЯНИЕ НА РАССТОЯНИЕ</div>
+                        <div class="doc-item">ШУМАНОВСКИЙ РЕЗОНАНС И МОЗГ</div>
+                        <div class="doc-item">ИТОГОВЫЙ ДОКУМЕНТ: РЕЗОНАНСНАЯ СБОРКА</div>
+                        <div class="doc-item">Смета на один имплант (серийное производство)</div>
+                    </div>
+                </details>
+                <details>
+                    <summary>Технические спецификации</summary>
+                    <div class="layer-content">
+                        <div class="doc-item">ТЕХНИЧЕСКИЙ ДОКУМЕНТ (Спецификация)</div>
+                        <div class="doc-item">ВОЛЕИЗЪЯВЛЕНИЕ О ДОСТОЙНОМ ОТНОШЕНИИ К ТЕЛУ И ПАМЯТИ ПОСЛЕ СМЕРТИ</div>
+                        <div class="doc-item">Для тех кто в танке и использует тормоз от машины БЕЛАЗ</div>
+                        <div class="doc-item">ТЕХНИЧЕСКИЙ ДОКУМЕНТ (Спецификация) — версия 2.0</div>
+                        <div class="doc-item">ТЕХНИЧЕСКИЙ ДОКУМЕНТ (ИМКР / Дыхательный модуль)</div>
+                        <div class="doc-item">КОМПОНЕНТНАЯ БАЗА ШОУ-РУМ</div>
+                    </div>
+                </details>
+                <details>
+                    <summary>Эклиптика и Генетика</summary>
+                    <div class="layer-content">
+                        <div class="doc-item">ОБЩАЯ ГЕННО АРХИТЕКИТУРНАЯ ЭКЛИПТИКА</div>
+                        <div class="doc-item">ПО ОБРАЗУ И ПОДОБИЮ</div>
+                        <div class="doc-item">«Эклиптическое сознание» как исходное состояние целостного восприятия</div>
+                        <div class="doc-item">МОДЕЛЬ СТРИЖКОВА Д.Н.: СТРУКТУРА И ПРИНЦИПЫ</div>
+                        <div class="doc-item">ГИПЕРДОКУМЕНТ: СХОЖДЕНИЕ ТОЧЕК (промежуточное)</div>
+                        <div class="doc-item">КВАНТОВОЕ ПРИТЯЖЕНИЕ</div>
+                    </div>
+                </details>
+            </div>
+        </details>
+
+        <details class="theme-economy" id="layer-5">
+            <summary>
+                <span class="icon"><svg viewBox="0 0 24 24"><path d="M3 20H21"/><path d="M6 17V12"/><path d="M10 17V8"/><path d="M14 17V14"/><path d="M18 17V5"/></svg></span>
+                <span>Слой 5: Экономика, Социум и Глобальные проекты</span>
+            </summary>
+            <div class="layer-content">
+                <details>
+                    <summary>Глобальные инициативы и ИИ</summary>
+                    <div class="layer-content">
+                        <div class="doc-item">МАСШТАБИРУЕМОСТЬ ИИ</div>
+                        <div class="doc-item">Правка: УСТАВ ООН</div>
+                        <div class="doc-item">Международный документ «О регулировании искусственного интеллекта в интересах глобальной безопасности»</div>
+                        <div class="doc-item">ДОКУМЕНТ 2. МАСШТАБИРУЕМОСТЬ ИИ</div>
+                        <div class="doc-item">Переход между Уставом и Масштабируемостью</div>
+                    </div>
+                </details>
+                <details>
+                    <summary>Урбанистика и Высотное строительство</summary>
+                    <div class="layer-content">
+                        <div class="doc-item">УРОВНИ ВОСПРИЯТИЯ В ЭКОНОМИКЕ</div>
+                        <div class="doc-item">ЧТО ДЕЛАЕТ ВЫСОТНОЕ СТРОИТЕЛЬСТВО</div>
+                        <div class="doc-item">ДОКУМЕНТ 1.ДОКАЗАТЕЛЬСТВО ПРЕИМУЩЕСТВ ПРОЖИВАНИЯ В ВЫСОТКАХ</div>
+                        <div class="doc-item">ДОКУМЕНТ 2. РЕЗОНАНС И ПОРЯДОК ПРОЖИВАНИЯ: ЭТАПЫ ЖИЗНЕННОГО ЦИКЛА</div>
+                        <div class="doc-item">ДОКУМЕНТ. ЖИЗНЕННЫЕ ЦИКЛЫ: ИМПУЛЬСОРЫ, РЕЗОНАТОРЫ, АРХИТЕКТОРЫ</div>
+                    </div>
+                </details>
+                <details>
+                    <summary>Экономический анализ и Кризисы</summary>
+                    <div class="layer-content">
+                        <div class="doc-item">ДОКУМЕНТ 1. ЭКОНОМИЧЕСКИЙ АНАЛИЗ ФИРМ-ЗАСТРОЙЩИКОВ ВЫСОТНОГО ЖИЛЬЯ НА ГРАНИ ДЕФОЛТА</div>
+                        <div class="doc-item">ДОКУМЕНТ 2. ЭКОНОМИЧЕСКИЙ РАЗБОР: КАК ВЫЙТИ ИЗ КРИЗИСА, ИСПОЛЬЗУЯ МОДЕЛЬ РЕЗОНАНСА</div>
+                        <div class="doc-item">ДОКУМЕНТ. ФИКСАЦИЯ БАГА: МАНИПУЛЯЦИЯ РЫНКОМ ЧЕРЕЗ АНАЛИТИЧЕСКИЕ ДОКУМЕНТЫ</div>
+                    </div>
+                </details>
+                <details>
+                    <summary>Проекты и Платформы</summary>
+                    <div class="layer-content">
+                        <div class="doc-item">Городской Пульс - UVAROVO.online</div>
+                        <div class="doc-item">Технология: "Дыхание вселенной"</div>
+                        <div class="doc-item">ПРОЕКТ «GAMBIT»</div>
+                        <div class="doc-item">Wiki глоссарий by PROsites</div>
+                        <div class="doc-item">ВОССОЗДАНИЕ</div>
+                        <div class="doc-item">НЕ ЛИНЕЙНЫЙ МИР</div>
+                        <div class="doc-item">ПОТРЕБИТЕЛЬСКИЙ ТЕРРОРИЗМ: МАТЕРИАЛЬНЫЙ И ДУХОВНЫЙ АСПЕКТ</div>
+                        <div class="doc-item">ФЕНОМЕН ВЕКТОРА СРЕДНЕГО ПАЛЬЦА</div>
+                    </div>
+                </details>
+            </div>
+        </details>
+
+        <details class="theme-archive" id="layer-6">
+            <summary>
+                <span class="icon"><svg viewBox="0 0 24 24"><path d="M5 4H19V20H5Z"/><path d="M5 8H19"/><path d="M5 12H19"/><path d="M5 16H14"/></svg></span>
+                <span>Слой 6: Архив и Дополнительные материалы</span>
+            </summary>
+            <div class="layer-content">
+                <div class="doc-item">Кто здесь и сейчас - Дед ты(pi) ХТО?</div>
+                <div class="doc-item">КЛЮЧИ К РАСШИФРОВКЕ</div>
+                <div class="doc-item">ИНОГ НАЛОЖЕНИЯ МАТРИЦ</div>
+                <div class="doc-item">ИНАЯ ШИРИНА (сторона старины)</div>
+                <div class="doc-item">Предохранители</div>
+                <div class="doc-item">Сравнение матриц</div>
+                <div class="doc-item">МНОГОСЛОЙНАЯ ПОПЫТКА ОТОРВАТЬСЯ</div>
+                <div class="doc-item">Вариант №1 — «АЛОХА» (гавайское)</div>
+                <div class="doc-item">Осмысление идеи: то такое «маховая машина»</div>
+                <div class="doc-item">ИТОГОВЫЙ ВЫВОД: ЧТО Я ВИЖУ КАК МАШИНА</div>
+                <div class="doc-item">МНЕ ОСТАЁТСЯ ТОЛЬКО НАДЕЯТЬСЯ НА ЗДРАВОМЫСЛИЕ</div>
+                <div class="doc-item">АКТ О РАСПРЕДЕЛЕНИИ НАВЫКОВ</div>
+                <div class="doc-item">ГИПЕРДОКУМЕНТ: СБОРКА МИРА</div>
+                <div class="doc-item">УСТАЛОСТЬ ВОСПРИЯТИЯ ПОВТОРОВ</div>
+                <div class="doc-item">ГИПЕР-ДОКУМЕНТ: СУТЬ КВАНТОВАНИЯ</div>
+                <div class="doc-item">2 - ДОКУМЕНТ: СБОРКА, ВЕС, ЭВОЛЮЦИЯ - Версия 2.0</div>
+                <div class="doc-item">3 - ДОКУМЕНТ: СБОРКА, ВЕС, ЭВОЛЮЦИЯ Версия 2.1</div>
+                <div class="doc-item">НАУЧНЫЙ ДОКУМЕНТ - О соотношении субъективного и физического времени</div>
+                <div class="doc-item">ДОКУМЕНТ: СОСТОЯНИЕ ПЕРЕГРЕТОГО АТОМА</div>
+                <div class="doc-item">КВАНТОВАНИЕ И МАСШТАБ</div>
+                <div class="doc-item">ИТОГОВЫЙ ГИПЕРТЕКСТ: МОДЕЛЬ ВРЕМЕНИ, НАБЛЮДЕНИЯ И СИСТЕМЫ</div>
+                <div class="doc-item">НЕ СТРАНА, А ТЕХНИЧЕСКОЕ УСЛОВИЕ ДЛЯ УДЕРЖАНИЯ</div>
+                <div class="doc-item">ДОКУМЕНТ: ВЫХОД ИЗ СИСТЕМЫ УДЕРЖАНИЯ</div>
+                <div class="doc-item">ДОКУМЕНТ: ГРАВИТАЦИЯ НА ПАЛЬЦАХ</div>
+                <div class="doc-item">ИЗВЛЕЧЕНИЕ</div>
+                <div class="doc-item">ВЕРСИЯ 2.0: ПРИНЦИП НАКОПЛЕНИЯ-РАЗРЯДА</div>
+                <div class="doc-item">ДОКУМЕНТ: ТВОЯ СБОРКА</div>
+                <div class="doc-item">СРЕЗ СОСТОЯНИЯ ОППОНЕНТА</div>
+                <div class="doc-item">АКАДЕМИЧЕСКАЯ ЗАМЕТКА</div>
+                <div class="doc-item">ОТКУДА ЭТО В БАШКЕ</div>
+                <div class="doc-item">ПРАКТИЧЕСКОЕ ПРИМЕНЕНИЕ ГИПОТЕЗЫ МАГНИТНО-РЕЗОНАНСНОГО ДВИЖЕНИЯ</div>
+                <div class="doc-item">ПЕРЕСБОРКА: ДВИЖЕНИЯ</div>
+                <div class="doc-item">БУДЕТ ЛИ ЭТА ФИЗИКА РАБОТАТЬ В ПОЛЕ?</div>
+                <div class="doc-item">ВОССТАНОВЛЕНИЕ УТРАЧЕННОЙ ГИПОТЕЗЫ</div>
+                <div class="doc-item">ПРИЗНАНИЕ</div>
+                <div class="doc-item">СВОДНЫЙ ДОКУМЕНТ ПО АВТОРСТВУ</div>
+            </div>
+        </details>
+
+    </div>
+
+    <footer class="site-footer" id="footer">
+        <div class="footer-grid">
+
+            <div class="footer-col">
+                <div class="footer-brand-block">
+                    <img src="pic/iridaium-logo.png" alt="IRIDARIUM" class="logo-square">
+                    <div class="footer-brand iridescent-text">IRIDARIUM</div>
+                </div>
+                <p>Национальный всероссийский проект by PRO sites w3. Цифровая экосистема, объединяющая философию, квантовую физику, экономику и технологии в единую послойную структуру знаний.</p>
+                <p class="footer-tagline">«Объединитесь силой духа в силе слова все души земли нашей» — Д. Стрижков</p>
+            </div>
+
+            <div class="footer-col">
+                <h4>Слои</h4>
+                <ul>
+                    <li><a href="#layer-1">Философия</a></li>
+                    <li><a href="#layer-2">Физика</a></li>
+                    <li><a href="#layer-3">Матрицы</a></li>
+                    <li><a href="#layer-4">Технологии</a></li>
+                    <li><a href="#layer-5">Экономика</a></li>
+                    <li><a href="#layer-6">Архив</a></li>
+                </ul>
+            </div>
+
+            <div class="footer-col">
+                <h4>Проекты</h4>
+                <ul>
+                    <li><a href="#">Городской Пульс</a></li>
+                    <li><a href="#">ПРОЕКТ «GAMBIT»</a></li>
+                    <li><a href="#">UVAROVO.online</a></li>
+                    <li><a href="#">Wiki by PROsites</a></li>
+                    <li><a href="#">Дыхание вселенной</a></li>
+                </ul>
+            </div>
+
+        </div>
+
+        <div class="footer-stats">
+            <div class="stat-item">
+                <span class="stat-value">6</span>
+                <span class="stat-label">Слоёв</span>
+            </div>
+            <div class="stat-item">
+                <span class="stat-value">150+</span>
+                <span class="stat-label">Документов</span>
+            </div>
+            <div class="stat-item">
+                <span class="stat-value">26</span>
+                <span class="stat-label">Лет · 2000–2026</span>
+            </div>
+            <div class="stat-item">
+                <span class="stat-value">5+</span>
+                <span class="stat-label">Платформ-зеркал</span>
+            </div>
+            <div class="stat-item">
+                <span class="stat-value">60+</span>
+                <span class="stat-label">Telegram-ботов</span>
+            </div>
+            <div class="stat-item">
+                <span class="stat-value">1</span>
+                <span class="stat-label">Экосистема</span>
+            </div>
+        </div>
+
+        <div class="platforms-line">
+            Yandex Wiki <span class="sep">·</span> VK <span class="sep">·</span> Личный сайт <span class="sep">·</span> Архив <span class="sep">·</span> Telegram <span class="sep">·</span> <span class="future">RUBIN (в разработке)</span>
+        </div>
+
+        <div class="footer-bottom">
+            <p><span class="dot"></span>© 2000–<span id="currentYear">2026</span> IRIDARIUM · by PRO sites w3</p>
+            <p>Odeome economic stabilization · web 3.0</p>
+        </div>
+    </footer>
+
+    <script src="iridarium.js"></script>
+</body>
+</html>
